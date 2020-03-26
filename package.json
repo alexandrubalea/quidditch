@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "@ad-dev/quidditch",
+  "scripts": {
+    "dev": "http-server",
+    "lint": "eslint --max-warnings 0 --ext .ts --ext .tsx src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "phaser": "3.22.0"
+  }
+}
