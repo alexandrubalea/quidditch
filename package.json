@@ -2,11 +2,20 @@
   "private": true,
   "name": "@ad-dev/quidditch",
   "scripts": {
-    "dev": "http-server",
+    "dev": "webpack-dev-server",
+    "build": "webpack",
     "lint": "eslint --max-warnings 0 --ext .ts --ext .tsx src",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "phaser": "3.22.0"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.1.1",
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
   }
 }
