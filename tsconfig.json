@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "sourceMap": true
+    "target": "es6",
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
+  "exclude": ["node_modules"],
   "include": ["**/*.ts"]
 }
