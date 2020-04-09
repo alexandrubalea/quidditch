@@ -1,32 +1,26 @@
 import * as Phaser from 'phaser';
 
+import { MenuScene, GameScene } from '@/scenes';
+
 const gameConfig: Phaser.Types.Core.GameConfig = {
   title: 'Sample',
   type: Phaser.AUTO,
   scale: {
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   },
   physics: {
     default: 'arcade',
     arcade: {
-      debug: true
-    }
-  },
-  scene: {
-    preload: preload,
-    create: create
+      debug: true,
+    },
   },
   parent: 'game',
-  backgroundColor: '#000000'
+  backgroundColor: '#000000',
 };
 
-function preload() {
-  this.load.image('background', './assets/background.png');
-}
+const game = new Phaser.Game(gameConfig);
 
-function create() {
-  this.add.image('200', '300', 'background');
-}
-
-export const game = new Phaser.Game(gameConfig);
+game.scene.add('MenuScene', new MenuScene());
+game.scene.add('GameScene', new GameScene());
+game.scene.start('MenuScene');
