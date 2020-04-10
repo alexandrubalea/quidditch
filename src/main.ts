@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 
-import { MenuScene, GameScene } from '@/scenes';
+import {ChoosePlayerScene, GameScene, MenuScene} from '@/scenes';
 
 const gameConfig: Phaser.Types.Core.GameConfig = {
   title: 'Sample',
@@ -22,5 +22,6 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
 const game = new Phaser.Game(gameConfig);
 
 game.scene.add('MenuScene', new MenuScene());
+game.scene.add('ChoosePlayerScene', new ChoosePlayerScene());
 game.scene.add('GameScene', new GameScene());
 game.scene.start('MenuScene');
