@@ -25,14 +25,14 @@ export class MenuScene extends Phaser.Scene {
       player2: 'player-ron',
     };
 
-    let player1 = this.add.text(width * 0.25, height * 0.1, 'PLAYER 1');
+    let player1 = this.add.text(width * 0.15, height * 0.1, 'PLAYER 1').setScale(3.00);
     this.add.sprite(player1XOffset, height * 0.675, 'player-harry').setScale(0.75);
 
-    let player2 = this.add.text(width * 0.75, height * 0.1, 'PLAYER 2 ');
+    let player2 = this.add.text(width * 0.65, height * 0.1, 'PLAYER 2 ').setScale(3.00);
     this.add.sprite(player2XOffset, height * 0.675, 'player-ron').setScale(0.75);
 
     this.add
-      .text(width * 0.5, height * 0.1, 'CHANGE')
+      .text(width * 0.44, height * 0.1, 'CHANGE').setScale(3.00)
       .setInteractive()
       .on('pointerdown', () => {
         if (player1.text == 'PLAYER 1') {
@@ -49,7 +49,7 @@ export class MenuScene extends Phaser.Scene {
       });
 
     this.add
-      .text(width * 0.5, height * 0.2, 'GO')
+      .text(width * 0.48, height * 0.2, 'GO').setScale(3).setFontFamily("arial")
       .setInteractive()
       .on('pointerdown', () => {
         this.scene.start('GameScene');
