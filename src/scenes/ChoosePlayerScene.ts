@@ -1,3 +1,15 @@
+import { Character, Player } from '@/domain';
+
+const characterToImage: Record<Character, string> = {
+  [Character.Harry]: 'player-harry',
+  [Character.Ron]: 'player-ron',
+};
+
+interface PlayerInfo {
+  character: Character;
+  sprite?: Phaser.GameObjects.Sprite;
+}
+
 export class ChoosePlayerScene extends Phaser.Scene {
   constructor() {
     super({ key: 'ChoosePlayerScene' });
@@ -5,8 +17,14 @@ export class ChoosePlayerScene extends Phaser.Scene {
 
   preload() {
     this.load.image('menu-background', 'assets/menu-background.jpg');
-    this.load.image('player-harry', 'assets/harry.png');
-    this.load.image('player-ron', 'assets/ron.png');
+    this.load.image(characterToImage[Character.Harry], 'assets/harry.png');
+    this.load.image(characterToImage[Character.Ron], 'assets/ron.png');
+  }
+
+  private switchPlayers(players: Record<Player, PlayerInfo>, offsets: Record<Player, number>) {
+    [players[Player.Player1], players[Player.Player2]] = [players[Player.Player2], players[Player.Player1]];
+    players[Player.Player1].sprite.x = offsets[Player.Player1];
+    players[Player.Player2].sprite.x = offsets[Player.Player2];
   }
 
   create() {
@@ -17,46 +35,62 @@ export class ChoosePlayerScene extends Phaser.Scene {
     background.setScale(width / background.displayWidth, height / background.displayHeight);
 
     const spaceBetween = width * 0.1;
-    const player1XOffset = width / 3 - spaceBetween / 2;
-    const player2XOffset = (width * 2) / 3 + spaceBetween / 2;
-
-    const players = {
-      player1: 'player-harry',
-      player2: 'player-ron',
+    const offsets: Record<Player, number> = {
+      [Player.Player1]: width / 3 - spaceBetween / 2,
+      [Player.Player2]: (width * 2) / 3 + spaceBetween / 2,
     };
 
-    let player1 = this.add.text(width * 0.15, height * 0.1, 'PLAYER 1').setScale(3.00)
-        .setShadow(3,1,"black", 2, true, true);
-    this.add.sprite(player1XOffset, height * 0.675, 'player-harry').setScale(0.75);
+    const players: Record<Player, PlayerInfo> = {
+      [Player.Player1]: {
+        character: Character.Harry,
+      },
+      [Player.Player2]: {
+        character: Character.Ron,
+      },
+    };
 
-    let player2 = this.add.text(width * 0.65, height * 0.1, 'PLAYER 2 ').setScale(3.00)
-        .setShadow(3,1,"black", 2, true, true);
-    this.add.sprite(player2XOffset, height * 0.675, 'player-ron').setScale(0.75);
+    // Add text for players
+    this.add
+      .text(width * 0.15, height * 0.1, 'PLAYER 1')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true);
 
     this.add
-      .text(width * 0.44, height * 0.1, 'SWITCH').setScale(3.00)
-        .setShadow(3,1,"black", 2, true, true)
+      .text(width * 0.65, height * 0.1, 'PLAYER 2 ')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true);
+
+    // Add player models
+    let harry = this.add
+      .sprite(offsets[Player.Player1], height * 0.675, characterToImage[Character.Harry])
+      .setScale(0.75);
+    let ron = this.add.sprite(offsets[Player.Player2], height * 0.675, characterToImage[Character.Ron]).setScale(0.75);
+
+    players[Player.Player1].sprite = harry;
+    players[Player.Player2].sprite = ron;
+
+    // Add buttons
+    this.add
+      .text(width * 0.44, height * 0.1, 'SWITCH')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true)
       .setInteractive()
       .on('pointerdown', () => {
-        if (player1.text == 'PLAYER 1') {
-          player1.setText('PLAYER 2');
-          players.player1 = 'player-ron';
-          player2.setText('PLAYER 1');
-          players.player2 = 'player-harry';
-        } else {
-          player1.setText('PLAYER 1');
-          players.player1 = 'player-harry';
-          player2.setText('PLAYER 2');
-          players.player2 = 'player-ron';
-        }
+        this.switchPlayers(players, offsets);
       });
 
     this.add
-      .text(width * 0.48, height * 0.2, 'GO').setScale(3)
-        .setShadow(3,1,"black", 2, true, true)
+      .text(width * 0.48, height * 0.2, 'GO')
+      .setScale(3)
+      .setShadow(3, 1, 'black', 2, true, true)
       .setInteractive()
       .on('pointerdown', () => {
-        this.scene.start('GameScene');
+        this.scene.start('GameScene', {
+          players: {
+            [Player.Player1]: players[Player.Player1].character,
+            [Player.Player2]: players[Player.Player2].character,
+          },
+        });
       });
   }
 }
