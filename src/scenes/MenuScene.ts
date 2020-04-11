@@ -5,7 +5,7 @@ export class MenuScene extends Phaser.Scene {
 
     preload() {
         this.load.image('background', 'assets/background.png');
-
+        this.load.bitmapFont('myfont', 'assets/HARRYP_.bmp');
     }
 
     create() {
@@ -15,6 +15,7 @@ export class MenuScene extends Phaser.Scene {
         const background = this.add.image(0, 0, 'background').setOrigin(0, 0);
         background.setScale(width / background.displayWidth, height / background.displayHeight);
 
+        // const startButton = this.add.bitmapText(width*0.45, height*0.2, 'myfont', 'START');
         this.add
             .text(width * 0.45, height * 0.2, 'START').setScale(3)
             .setShadow(3,1,"black", 2, true, true)
@@ -22,5 +23,8 @@ export class MenuScene extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.scene.start('ChoosePlayerScene');
             });
+
+        this.add.text(width * 0.4, height * 0.4, 'LEADERBOARD').setScale(3)
+            .setShadow(3,1,"black", 2, true, true);
     }
 }
