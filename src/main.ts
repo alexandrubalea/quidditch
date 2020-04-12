@@ -1,6 +1,9 @@
 import * as Phaser from 'phaser';
 
-import {ChoosePlayerScene, GameScene, MenuScene} from '@/scenes';
+import MenuScene, { SceneKey as MenuSceneKey } from '@/scenes/MenuScene';
+import ChoosePlayerScene, { SceneKey as ChoosePlayerSceneKey } from '@/scenes/ChoosePlayerScene';
+import GameScene, { SceneKey as GameSceneKey } from '@/scenes/GameScene';
+import HelpScene, { SceneKey as HelpSceneKey } from '@/scenes/HelpScene';
 
 const gameConfig: Phaser.Types.Core.GameConfig = {
   title: 'Sample',
@@ -22,7 +25,8 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
 
 const game = new Phaser.Game(gameConfig);
 
-game.scene.add('MenuScene', new MenuScene());
-game.scene.add('ChoosePlayerScene', new ChoosePlayerScene());
-game.scene.add('GameScene', new GameScene());
-game.scene.start('MenuScene');
+game.scene.add(MenuSceneKey, new MenuScene());
+game.scene.add(ChoosePlayerSceneKey, new ChoosePlayerScene());
+game.scene.add(GameSceneKey, new GameScene());
+game.scene.add(HelpSceneKey, new HelpScene());
+game.scene.start(MenuSceneKey);

@@ -1,15 +1,14 @@
-import { SceneKey as HelpScene } from '@/scenes/HelpScene';
+import { SceneKey as MenuScene } from '@/scenes/MenuScene';
 
-export const SceneKey = 'MenuScene';
+export const SceneKey = 'HelpScene';
 
-export default class MenuScene extends Phaser.Scene {
+export default class HelpScene extends Phaser.Scene {
   constructor() {
     super({ key: SceneKey });
   }
 
   preload() {
     this.load.image('background', 'assets/background.png');
-    this.load.bitmapFont('myfont', 'assets/HARRYP_.bmp');
   }
 
   create() {
@@ -19,31 +18,27 @@ export default class MenuScene extends Phaser.Scene {
     const background = this.add.image(0, 0, 'background').setOrigin(0, 0);
     background.setScale(width / background.displayWidth, height / background.displayHeight);
 
-    // const startButton = this.add.bitmapText(width*0.45, height*0.2, 'myfont', 'START');
     this.add
-      .text(width * 0.5, height * 0.25, 'START')
-      .setScale(3)
-      .setShadow(3, 1, 'black', 2, true, true)
-      .setOrigin(0.5)
-      .setInteractive()
-      .on('pointerdown', () => {
-        this.scene.start('ChoosePlayerScene');
-      });
-
-    this.add
-      .text(width * 0.5, height * 0.5, 'LEADERBOARD')
+      .text(width * 0.5, height * 0.25, 'USE W, A, S, D to control player 1')
       .setScale(3)
       .setShadow(3, 1, 'black', 2, true, true)
       .setOrigin(0.5);
 
     this.add
-      .text(width * 0.5, height * 0.75, 'HELP')
+      .text(width * 0.5, height * 0.5, 'USE UP, DOWN, LEFT, RIGHT to control player 2')
+      .setScale(3)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5);
+
+    this.add
+      .text(width * 0.5, height * 0.75, 'BACK')
       .setScale(3)
       .setShadow(3, 1, 'black', 2, true, true)
       .setOrigin(0.5)
       .setInteractive()
       .on('pointerdown', () => {
-        this.scene.switch(HelpScene);
+        this.scene.stop();
+        this.scene.wake(MenuScene);
       });
   }
 }

@@ -1,4 +1,5 @@
 import { Character, Player } from '@/domain';
+import { SceneKey as GameScene } from '@/scenes/GameScene';
 
 const characterToImage: Record<Character, string> = {
   [Character.Harry]: 'player-harry',
@@ -10,9 +11,11 @@ interface PlayerInfo {
   sprite?: Phaser.GameObjects.Sprite;
 }
 
-export class ChoosePlayerScene extends Phaser.Scene {
+export const SceneKey = 'ChoosePlayerScene';
+
+export default class ChoosePlayerScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'ChoosePlayerScene' });
+    super({ key: SceneKey });
   }
 
   preload() {
@@ -34,7 +37,7 @@ export class ChoosePlayerScene extends Phaser.Scene {
     const background = this.add.image(0, 0, 'menu-background').setOrigin(0, 0);
     background.setScale(width / background.displayWidth, height / background.displayHeight);
 
-    const spaceBetween = width * 0.1;
+    const spaceBetween = width * 0.15;
     const offsets: Record<Player, number> = {
       [Player.Player1]: width / 3 - spaceBetween / 2,
       [Player.Player2]: (width * 2) / 3 + spaceBetween / 2,
@@ -51,14 +54,16 @@ export class ChoosePlayerScene extends Phaser.Scene {
 
     // Add text for players
     this.add
-      .text(width * 0.15, height * 0.1, 'PLAYER 1')
+      .text(offsets[Player.Player1], height * 0.1, 'PLAYER 1')
       .setScale(3.0)
-      .setShadow(3, 1, 'black', 2, true, true);
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5);
 
     this.add
-      .text(width * 0.65, height * 0.1, 'PLAYER 2 ')
+      .text(offsets[Player.Player2], height * 0.1, 'PLAYER 2 ')
       .setScale(3.0)
-      .setShadow(3, 1, 'black', 2, true, true);
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5);
 
     // Add player models
     let harry = this.add
@@ -71,21 +76,23 @@ export class ChoosePlayerScene extends Phaser.Scene {
 
     // Add buttons
     this.add
-      .text(width * 0.44, height * 0.1, 'SWITCH')
+      .text(width * 0.5, height * 0.1, 'SWITCH')
       .setScale(3.0)
       .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5)
       .setInteractive()
       .on('pointerdown', () => {
         this.switchPlayers(players, offsets);
       });
 
     this.add
-      .text(width * 0.48, height * 0.2, 'GO')
+      .text(width * 0.5, height * 0.2, 'GO')
       .setScale(3)
       .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5)
       .setInteractive()
       .on('pointerdown', () => {
-        this.scene.start('GameScene', {
+        this.scene.start(GameScene, {
           players: {
             [Player.Player1]: players[Player.Player1].character,
             [Player.Player2]: players[Player.Player2].character,
