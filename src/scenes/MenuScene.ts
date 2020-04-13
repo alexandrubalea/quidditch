@@ -21,7 +21,7 @@ export default class MenuScene extends Phaser.Scene {
 
     // const startButton = this.add.bitmapText(width*0.45, height*0.2, 'myfont', 'START');
     this.add
-      .text(width * 0.5, height * 0.25, 'START')
+      .text(width * 0.5, height * 0.33, 'START')
       .setScale(3)
       .setShadow(3, 1, 'black', 2, true, true)
       .setOrigin(0.5)
@@ -31,13 +31,7 @@ export default class MenuScene extends Phaser.Scene {
       });
 
     this.add
-      .text(width * 0.5, height * 0.5, 'LEADERBOARD')
-      .setScale(3)
-      .setShadow(3, 1, 'black', 2, true, true)
-      .setOrigin(0.5);
-
-    this.add
-      .text(width * 0.5, height * 0.75, 'HELP')
+      .text(width * 0.5, height * 0.66, 'HELP')
       .setScale(3)
       .setShadow(3, 1, 'black', 2, true, true)
       .setOrigin(0.5)

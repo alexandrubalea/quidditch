@@ -1,5 +1,5 @@
+import { SceneKey as MenuScene } from '@/scenes/MenuScene';
 import { Character, Player } from '@/domain';
-import { Game } from 'phaser';
 
 const VELOCITY = 5;
 
@@ -27,6 +27,8 @@ export default class GameScene extends Phaser.Scene {
   ball: Phaser.Physics.Arcade.Sprite;
   player1Scored: Phaser.GameObjects.Text;
   player2Scored: Phaser.GameObjects.Text;
+  player1Won: Phaser.GameObjects.Text;
+  player2Won: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: SceneKey });
@@ -81,6 +83,14 @@ export default class GameScene extends Phaser.Scene {
 
   player2HasScore(ringX: number, ringY: number) {
     return this.ball.body.deltaX() < 0 && this.ball.x < ringX && ringY - 20 < this.ball.y && this.ball.y < ringY + 100;
+  }
+
+  player1HasWon() {
+    return this.players[Player.Player1].score == 100;
+  }
+
+  player2HasWon() {
+    return this.players[Player.Player2].score == 100;
   }
 
   increasePlayerScore(player: PlayerInfo) {
@@ -155,6 +165,20 @@ export default class GameScene extends Phaser.Scene {
       .setShadow(3, 1, 'black', 2, true, true)
       .setOrigin(0.5)
       .setVisible(false);
+
+    this.player1Won = this.add
+      .text(width * 0.5, height * 0.5, 'Player 1 has won')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5)
+      .setVisible(false);
+
+    this.player2Won = this.add
+      .text(width * 0.5, height * 0.5, 'Player 2 has won')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5)
+      .setVisible(false);
   }
 
   update() {
@@ -199,12 +223,18 @@ export default class GameScene extends Phaser.Scene {
 
     if (this.player1HasScore(width - 60, ringCenterY)) {
       this.increasePlayerScore(player1);
-      this.player1Scored.setVisible(true);
-      this.scene.pause();
-      setTimeout(() => {
-        this.resetScene();
-        this.scene.resume();
-      }, 2500);
+      if (this.player1HasWon()) {
+        this.player1Won.setVisible(true);
+        this.scene.pause();
+        setTimeout(() => this.scene.start(MenuScene), 2000);
+      } else {
+        this.player1Scored.setVisible(true);
+        this.scene.pause();
+        setTimeout(() => {
+          this.resetScene();
+          this.scene.resume();
+        }, 1250);
+      }
     }
 
     // Player 2 controls
@@ -238,12 +268,18 @@ export default class GameScene extends Phaser.Scene {
 
     if (this.player2HasScore(100, ringCenterY)) {
       this.increasePlayerScore(player2);
-      this.player2Scored.setVisible(true);
-      this.scene.pause();
-      setTimeout(() => {
-        this.resetScene();
-        this.scene.resume();
-      }, 2500);
+      if (this.player2HasWon()) {
+        this.player2Won.setVisible(true);
+        this.scene.pause();
+        setTimeout(() => this.scene.start(MenuScene), 2000);
+      } else {
+        this.player2Scored.setVisible(true);
+        this.scene.pause();
+        setTimeout(() => {
+          this.resetScene();
+          this.scene.resume();
+        }, 1250);
+      }
     }
   }
 }
