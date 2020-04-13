@@ -1,4 +1,5 @@
 import { Character, Player } from '@/domain';
+import { Game } from 'phaser';
 
 const VELOCITY = 5;
 
@@ -14,6 +15,7 @@ interface Data {
 interface PlayerInfo {
   character: Character;
   score: number;
+  scoreboard?: Phaser.GameObjects.Text;
   hasBall?: boolean;
   sprite?: Phaser.Physics.Arcade.Sprite;
 }
@@ -23,6 +25,8 @@ export const SceneKey = 'GameScene';
 export default class GameScene extends Phaser.Scene {
   players: Record<Player, PlayerInfo>;
   ball: Phaser.Physics.Arcade.Sprite;
+  player1Scored: Phaser.GameObjects.Text;
+  player2Scored: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: SceneKey });
@@ -43,10 +47,45 @@ export default class GameScene extends Phaser.Scene {
     };
   }
 
+  resetScene() {
+    const height = this.game.renderer.height;
+    const width = this.game.renderer.width;
+
+    this.ball.setVelocity(0);
+    this.ball.x = width / 2;
+    this.ball.y = height / 2;
+
+    const player1 = this.players[Player.Player1].sprite;
+    player1.setVelocity(0);
+    player1.x = width / 2 - 200;
+    player1.y = height;
+
+    const player2 = this.players[Player.Player2].sprite;
+    player2.setVelocity(0);
+    player2.x = width / 2 + 200;
+    player2.y = height;
+
+    this.player1Scored.setVisible(false);
+    this.player2Scored.setVisible(false);
+  }
+
   isBallAroundPlayer(player: Phaser.Physics.Arcade.Sprite) {
     return (
       Math.sqrt(Math.pow(player.body.x - this.ball.body.x, 2) + Math.pow(player.body.y - this.ball.body.y, 2)) < 125
     );
+  }
+
+  player1HasScore(ringX: number, ringY: number) {
+    return this.ball.body.deltaX() > 0 && this.ball.x > ringX && ringY - 20 < this.ball.y && this.ball.y < ringY + 100;
+  }
+
+  player2HasScore(ringX: number, ringY: number) {
+    return this.ball.body.deltaX() < 0 && this.ball.x < ringX && ringY - 20 < this.ball.y && this.ball.y < ringY + 100;
+  }
+
+  increasePlayerScore(player: PlayerInfo) {
+    player.score += 10;
+    player.scoreboard.text = player.score.toString();
   }
 
   preload() {
@@ -62,6 +101,7 @@ export default class GameScene extends Phaser.Scene {
     const width = this.game.renderer.width;
 
     const player1 = this.players[Player.Player1];
+
     const player2 = this.players[Player.Player2];
 
     const background = this.add.image(0, 0, 'game-background').setOrigin(0, 0);
@@ -74,14 +114,24 @@ export default class GameScene extends Phaser.Scene {
     rightRing.flipX = true;
     rightRing.scaleY = 1.1;
 
-    player1.sprite = this.physics.add.sprite(width * 0.3, height, playerToImage[player1.character]).setScale(0.2);
+    player1.sprite = this.physics.add.sprite(width / 2 - 200, height, playerToImage[player1.character]).setScale(0.2);
     //@ts-ignore
     player1.sprite.body.allowGravity = false;
+    player1.scoreboard = this.add
+      .text(40, height * 0.1, '0')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5);
 
-    player2.sprite = this.physics.add.sprite(width * 0.6, height, playerToImage[player2.character]).setScale(0.2);
+    player2.sprite = this.physics.add.sprite(width / 2 + 200, height, playerToImage[player2.character]).setScale(0.2);
     player2.sprite.flipX = true;
     //@ts-ignore
     player2.sprite.body.allowGravity = false;
+    player2.scoreboard = this.add
+      .text(width - 40, height * 0.1, '0')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5);
 
     player1.sprite.setCollideWorldBounds(true);
     player2.sprite.setCollideWorldBounds(true);
@@ -91,6 +141,20 @@ export default class GameScene extends Phaser.Scene {
     this.ball.setBounce(0.3);
     this.ball.setDrag(0.1);
     this.ball.setCollideWorldBounds(true);
+
+    this.player1Scored = this.add
+      .text(width * 0.5, height * 0.5, 'Player 1 has scored')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5)
+      .setVisible(false);
+
+    this.player2Scored = this.add
+      .text(width * 0.5, height * 0.5, 'Player 2 has scored')
+      .setScale(3.0)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5)
+      .setVisible(false);
   }
 
   update() {
@@ -98,6 +162,7 @@ export default class GameScene extends Phaser.Scene {
     const player2 = this.players[Player.Player2];
 
     const height = this.game.renderer.height;
+    const width = this.game.renderer.width;
     const ringCenterY = height - 512 * 1.1 + 20;
 
     const player1Keys: any = this.input.keyboard.addKeys('W,S,A,D,Q,E');
@@ -132,6 +197,16 @@ export default class GameScene extends Phaser.Scene {
       this.ball.setVelocity(1000, ringCenterY - player1.sprite.body.y * 1.5);
     }
 
+    if (this.player1HasScore(width - 60, ringCenterY)) {
+      this.increasePlayerScore(player1);
+      this.player1Scored.setVisible(true);
+      this.scene.pause();
+      setTimeout(() => {
+        this.resetScene();
+        this.scene.resume();
+      }, 2500);
+    }
+
     // Player 2 controls
     if (player2Keys.left.isDown) {
       player2.sprite.x -= VELOCITY;
@@ -159,6 +234,16 @@ export default class GameScene extends Phaser.Scene {
       //@ts-ignore
       this.ball.body.allowGravity = true;
       this.ball.setVelocity(-1000, ringCenterY - player2.sprite.body.y * 1.5);
+    }
+
+    if (this.player2HasScore(100, ringCenterY)) {
+      this.increasePlayerScore(player2);
+      this.player2Scored.setVisible(true);
+      this.scene.pause();
+      setTimeout(() => {
+        this.resetScene();
+        this.scene.resume();
+      }, 2500);
     }
   }
 }
