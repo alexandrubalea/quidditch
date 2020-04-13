@@ -13,6 +13,8 @@ interface Data {
 
 interface PlayerInfo {
   character: Character;
+  score: number;
+  hasBall?: boolean;
   sprite?: Phaser.Physics.Arcade.Sprite;
 }
 
@@ -20,6 +22,7 @@ export const SceneKey = 'GameScene';
 
 export default class GameScene extends Phaser.Scene {
   players: Record<Player, PlayerInfo>;
+  ball: Phaser.Physics.Arcade.Sprite;
 
   constructor() {
     super({ key: SceneKey });
@@ -28,17 +31,28 @@ export default class GameScene extends Phaser.Scene {
   init(data: Data) {
     this.players = {
       [Player.Player1]: {
+        score: 0,
+        hasBall: false,
         character: data.players[Player.Player1],
       },
       [Player.Player2]: {
+        score: 0,
+        hasBall: false,
         character: data.players[Player.Player2],
       },
     };
   }
 
+  isBallAroundPlayer(player: Phaser.Physics.Arcade.Sprite) {
+    return (
+      Math.sqrt(Math.pow(player.body.x - this.ball.body.x, 2) + Math.pow(player.body.y - this.ball.body.y, 2)) < 125
+    );
+  }
+
   preload() {
     this.load.image('game-background', 'assets/background.png');
     this.load.image('ball', 'assets/ball.png');
+    this.load.image('ring', 'assets/ring.png');
     this.load.image(playerToImage[Character.Harry], 'assets/harry-broom.png');
     this.load.image(playerToImage[Character.Ron], 'assets/ron-broom.png');
   }
@@ -47,57 +61,104 @@ export default class GameScene extends Phaser.Scene {
     const height = this.game.renderer.height;
     const width = this.game.renderer.width;
 
+    const player1 = this.players[Player.Player1];
+    const player2 = this.players[Player.Player2];
+
     const background = this.add.image(0, 0, 'game-background').setOrigin(0, 0);
     background.setScale(width / background.displayWidth, height / background.displayHeight);
 
-    this.players[Player.Player1].sprite = this.physics.add
-      .sprite(width * 0.3, height, playerToImage[this.players[Player.Player1].character])
-      .setScale(0.3);
+    const leftRing = this.add.image(40, height, 'ring').setOrigin(0, 1);
+    leftRing.scaleY = 1.1;
+
+    const rightRing = this.add.image(width - 60, height, 'ring').setOrigin(1, 1);
+    rightRing.flipX = true;
+    rightRing.scaleY = 1.1;
+
+    player1.sprite = this.physics.add.sprite(width * 0.3, height, playerToImage[player1.character]).setScale(0.2);
     //@ts-ignore
-    this.players[Player.Player1].sprite.body.allowGravity = false;
+    player1.sprite.body.allowGravity = false;
 
-    this.players[Player.Player2].sprite = this.physics.add
-      .sprite(width * 0.6, height, playerToImage[this.players[Player.Player2].character])
-      .setScale(0.3);
-    this.players[Player.Player2].sprite.flipX = true;
+    player2.sprite = this.physics.add.sprite(width * 0.6, height, playerToImage[player2.character]).setScale(0.2);
+    player2.sprite.flipX = true;
     //@ts-ignore
-    this.players[Player.Player2].sprite.body.allowGravity = false;
+    player2.sprite.body.allowGravity = false;
 
-    this.players[Player.Player1].sprite.setCollideWorldBounds(true);
-    this.players[Player.Player2].sprite.setCollideWorldBounds(true);
-    this.players[Player.Player1].sprite.setGravity(0);
+    player1.sprite.setCollideWorldBounds(true);
+    player2.sprite.setCollideWorldBounds(true);
+    player1.sprite.setGravity(0);
 
-    const ball = this.physics.add.sprite(width / 2, height / 2, 'ball').setScale(0.15);
-    ball.setBounce(0.2);
-    ball.setCollideWorldBounds(true);
+    this.ball = this.physics.add.sprite(width / 2, height / 2, 'ball').setScale(0.1);
+    this.ball.setBounce(0.3);
+    this.ball.setDrag(0.1);
+    this.ball.setCollideWorldBounds(true);
   }
 
   update() {
-    const player1Keys: any = this.input.keyboard.addKeys('W,S,A,D');
-    const player2Keys = this.input.keyboard.createCursorKeys();
+    const player1 = this.players[Player.Player1];
+    const player2 = this.players[Player.Player2];
+
+    const height = this.game.renderer.height;
+    const ringCenterY = height - 512 * 1.1 + 20;
+
+    const player1Keys: any = this.input.keyboard.addKeys('W,S,A,D,Q,E');
+    const player2Keys: any = this.input.keyboard.addKeys('up, down, left, right, K, L');
 
     // Player 1 controls
     if (player1Keys.A.isDown) {
-      this.players[Player.Player1].sprite.x -= VELOCITY;
+      player1.sprite.x -= VELOCITY;
+      player1.sprite.flipX = true;
     } else if (player1Keys.D.isDown) {
-      this.players[Player.Player1].sprite.x += VELOCITY;
+      player1.sprite.x += VELOCITY;
+      player1.sprite.flipX = false;
     }
     if (player1Keys.W.isDown) {
-      this.players[Player.Player1].sprite.y -= VELOCITY;
+      player1.sprite.y -= VELOCITY;
     } else if (player1Keys.S.isDown) {
-      this.players[Player.Player1].sprite.y += VELOCITY;
+      player1.sprite.y += VELOCITY;
+    }
+    if (player1Keys.Q.isDown && this.isBallAroundPlayer(player1.sprite) && !player2.hasBall) {
+      //@ts-ignore
+      this.ball.body.allowGravity = false;
+      player1.hasBall = true;
+    }
+    if (player1.hasBall) {
+      this.ball.x = player1.sprite.x;
+      this.ball.y = player1.sprite.y;
+    }
+    if (player1Keys.E.isDown && player1.hasBall && !player2.hasBall) {
+      player1.hasBall = false;
+      //@ts-ignore
+      this.ball.body.allowGravity = true;
+      this.ball.setVelocity(1000, ringCenterY - player1.sprite.body.y * 1.5);
     }
 
     // Player 2 controls
     if (player2Keys.left.isDown) {
-      this.players[Player.Player2].sprite.x -= VELOCITY;
+      player2.sprite.x -= VELOCITY;
+      player2.sprite.flipX = true;
     } else if (player2Keys.right.isDown) {
-      this.players[Player.Player2].sprite.x += VELOCITY;
+      player2.sprite.x += VELOCITY;
+      player2.sprite.flipX = false;
     }
     if (player2Keys.up.isDown) {
-      this.players[Player.Player2].sprite.y -= VELOCITY;
+      player2.sprite.y -= VELOCITY;
     } else if (player2Keys.down.isDown) {
-      this.players[Player.Player2].sprite.y += VELOCITY;
+      player2.sprite.y += VELOCITY;
+    }
+    if (player2Keys.K.isDown && this.isBallAroundPlayer(player2.sprite) && !player1.hasBall) {
+      //@ts-ignore
+      this.ball.body.allowGravity = false;
+      player2.hasBall = true;
+    }
+    if (player2.hasBall) {
+      this.ball.x = player2.sprite.x;
+      this.ball.y = player2.sprite.y;
+    }
+    if (player2Keys.L.isDown && player2.hasBall && !player1.hasBall) {
+      player2.hasBall = false;
+      //@ts-ignore
+      this.ball.body.allowGravity = true;
+      this.ball.setVelocity(-1000, ringCenterY - player2.sprite.body.y * 1.5);
     }
   }
 }
