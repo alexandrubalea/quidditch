@@ -3,6 +3,7 @@
   "name": "@ad-dev/quidditch",
   "scripts": {
     "dev": "webpack-dev-server",
+    "start": "webpack-dev-server",
     "build": "webpack",
     "lint": "eslint --max-warnings 0 --ext .ts --ext .tsx src",
     "typecheck": "tsc --noEmit"

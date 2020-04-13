@@ -19,19 +19,37 @@ export default class HelpScene extends Phaser.Scene {
     background.setScale(width / background.displayWidth, height / background.displayHeight);
 
     this.add
-      .text(width * 0.5, height * 0.25, 'USE W, A, S, D to control player 1')
+      .text(width * 0.5, height * 0.2, 'USE W, A, S, D to move player 1')
       .setScale(3)
       .setShadow(3, 1, 'black', 2, true, true)
       .setOrigin(0.5);
 
     this.add
-      .text(width * 0.5, height * 0.5, 'USE UP, DOWN, LEFT, RIGHT to control player 2')
+      .text(width * 0.5, height * 0.3, 'USE Q to grab the ball, E to throw')
       .setScale(3)
       .setShadow(3, 1, 'black', 2, true, true)
       .setOrigin(0.5);
 
     this.add
-      .text(width * 0.5, height * 0.75, 'BACK')
+      .text(width * 0.5, height * 0.4, 'USE UP, DOWN, LEFT, RIGHT to move player 2')
+      .setScale(3)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5);
+
+    this.add
+      .text(width * 0.5, height * 0.5, 'USE K to grab the ball, L to throw')
+      .setScale(3)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5);
+
+    this.add
+      .text(width * 0.5, height * 0.7, 'First player that hits 100 points wins')
+      .setScale(3)
+      .setShadow(3, 1, 'black', 2, true, true)
+      .setOrigin(0.5);
+
+    this.add
+      .text(width * 0.5, height * 0.8, 'BACK')
       .setScale(3)
       .setShadow(3, 1, 'black', 2, true, true)
       .setOrigin(0.5)
