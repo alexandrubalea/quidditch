@@ -10,6 +10,7 @@ export default class MenuScene extends Phaser.Scene {
   preload() {
     this.load.image('background', 'assets/background.png');
     this.load.bitmapFont('myfont', 'assets/HARRYP_.bmp');
+    this.load.atlas('gems', 'assets/gems.png', 'assets/gems.json');
   }
 
   create() {
@@ -18,6 +19,24 @@ export default class MenuScene extends Phaser.Scene {
 
     const background = this.add.image(0, 0, 'background').setOrigin(0, 0);
     background.setScale(width / background.displayWidth, height / background.displayHeight);
+
+    // diamond animation
+    var animConfig = {
+      key: 'diamond',
+      frames: this.anims.generateFrameNames('gems', { prefix: 'diamond_', end: 15, zeroPad: 4 }),
+      repeat: -1,
+      showOnStart: true
+    };
+
+    this.anims.create(animConfig);
+
+    var gem = this.add.sprite(width/2, 100, 'gems');
+
+    //  Set sprite to visible false
+    gem.visible = false;
+
+    //  Sprite will have visible = true set when it starts because of 'showOnStart' property
+    gem.play('diamond');
 
     // const startButton = this.add.bitmapText(width*0.45, height*0.2, 'myfont', 'START');
     this.add

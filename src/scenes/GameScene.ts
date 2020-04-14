@@ -107,6 +107,15 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+
+    var player1Animation = this.anims.create({
+      key: 'float',
+      //@ts-ignore
+      // frames: this.anims.generateFrameNumbers('players'),
+      // frameRate: 16,
+      // repeat: 0
+    });
+
     const height = this.game.renderer.height;
     const width = this.game.renderer.width;
 
@@ -124,7 +133,18 @@ export default class GameScene extends Phaser.Scene {
     rightRing.flipX = true;
     rightRing.scaleY = 1.1;
 
+    //@ts-ignore
     player1.sprite = this.physics.add.sprite(width / 2 - 200, height, playerToImage[player1.character]).setScale(0.2);
+
+    // player1.sprite.play('float');
+    // player1.sprite.anims.setRepeat(7);
+    // this.tweens.add({
+    //   targets: player1.sprite,
+    //   x: 750,
+    //   duration: 8800,
+    //   ease: 'Linear'
+    // });
+
     //@ts-ignore
     player1.sprite.body.allowGravity = false;
     player1.scoreboard = this.add
@@ -137,6 +157,16 @@ export default class GameScene extends Phaser.Scene {
     player2.sprite.flipX = true;
     //@ts-ignore
     player2.sprite.body.allowGravity = false;
+
+    // player2.sprite.play('float');
+    // player2.sprite.anims.setRepeat(7);
+    // this.tweens.add({
+    //   targets: player2.sprite,
+    //   x: 750,
+    //   duration: 8800,
+    //   ease: 'Linear'
+    // });
+
     player2.scoreboard = this.add
       .text(width - 40, height * 0.1, '0')
       .setScale(3.0)
